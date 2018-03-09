@@ -67,6 +67,16 @@ namespace :cartodb do
       puts DateTime.now
     end
 
+    load_dataset_in_data_library_args = [:source_username, :source_dataset, :granted_api_key, :target_username,
+                                         :target_api_key]
+    desc 'Loads a dataset in a Data Library. `granted_api_key` is the key that will be stored for importing.'
+    task :load_dataset_in_data_library, load_dataset_in_data_library_args => [:environment] do
+      raise "All arguments are mandatory" unless load_dataset_in_data_library_args.all { |a| args[a].present? }
+
+      client = CartoAPI::Client.new
+      Carto::DataLibraryService.new.load_dataset!(client, args)
+    end
+
     desc "Invalidate user's date flag and make them refresh data library"
     task :invalidate_common_data => [:environment] do
       require_relative '../../app/helpers/common_data_redis_cache'
